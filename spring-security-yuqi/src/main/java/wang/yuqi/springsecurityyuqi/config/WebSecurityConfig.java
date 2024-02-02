@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -62,7 +63,15 @@ public class WebSecurityConfig {
                                         .authenticated());
         http.httpBasic(withDefaults())
                 .addFilterBefore(jwtFilterConfig, UsernamePasswordAuthenticationFilter.class)
-                .authenticationProvider(authenticationProvider());
+                .authenticationProvider(authenticationProvider())
+                // session的创建策略为无状态
+                .sessionManagement(
+                        ( httpSecuritySessionManagementConfigurer ->
+                                // Spring Security永远不会创建HttpSession，也永远不会使用它来获取SecurityContext
+                                httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        ))
+
+                ;
         return http.build();
     }
 
