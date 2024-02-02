@@ -15,6 +15,7 @@ import java.security.Key;
 import java.security.PublicKey;
 import java.time.Duration;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -37,8 +38,12 @@ public class JWTUtils {
     public String generateJSONWebToken(@NonNull Map<String, Object> claims, @NonNull UserDetails userDetails) {
        return createJSONWebToken(claims, userDetails);
     }
+    public String generateJSONWebToken(@NonNull UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        return createJSONWebToken(claims, userDetails);
+    }
 
-    public String  createJSONWebToken(@NonNull Map<String,Object> claims,@NonNull UserDetails userDetails){
+    public String  createJSONWebToken(Map<String,Object> claims,UserDetails userDetails){
         return Jwts.builder()
                 .subject(userDetails.getUsername())
                 .claims(claims)
