@@ -12,6 +12,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -25,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import wang.yuqi.springsecurityyuqi.dao.UserDetailDao;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,23 +39,12 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @AllArgsConstructor
 public class WebSecurityConfig {
-    private static final String ROLE_ADMIN = "ROLE_ADMIN";
 
     private final JwtFilterConfig jwtFilterConfig;
+    private final UserDetailDao userDetailDao;
     private final String  username = "yuqi";
 
-    private final List<UserDetails> APPLICATION_USER = List.of(
-            new User(
-                    "yuqi"
-                    ,"wang"
-                    , Collections.singleton(new SimpleGrantedAuthority(ROLE_ADMIN))
-            ),
-            new User(
-                    "liu"
-                    ,"yang"
-                    ,Collections.singleton(new SimpleGrantedAuthority(ROLE_ADMIN))
-            )
-    ) ;
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
@@ -70,6 +61,8 @@ public class WebSecurityConfig {
         http.httpBasic(withDefaults())
                 .addFilterBefore(jwtFilterConfig, UsernamePasswordAuthenticationFilter.class)
                 .authenticationProvider(authenticationProvider())
+                .csrf(AbstractHttpConfigurer::disable) // 防止csrf攻击
+                .securityMatcher("**/v1/greeting/**")
                 // session的创建策略为无状态
                 .sessionManagement(
                         ( httpSecuritySessionManagementConfigurer ->
@@ -97,17 +90,8 @@ public class WebSecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return new UserDetailsService() {
-            // 重写覆盖原有的方法
-            @Override
-            public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-                return APPLICATION_USER.stream()
-                        .filter(userDetails -> userDetails.getUsername().equals(username))
-                        .findFirst()
-                        .orElseThrow(() -> new UsernameNotFoundException(STR."Unfortunately \{username} is not found"))
-                        ;
-            }
-        };
+        // 重写覆盖原有的方法
+        return userDetailDao::loadUserByUsername;
     }
 
 }

@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+import wang.yuqi.springsecurityyuqi.dao.UserDetailDao;
 import wang.yuqi.springsecurityyuqi.util.JWTUtils;
 
 import java.io.IOException;
@@ -23,8 +24,8 @@ import java.io.IOException;
 public class JwtFilterConfig extends OncePerRequestFilter {
 
 
-    private UserDetailsService userDetailsService;
-    private JWTUtils jwtUtils;
+    private final UserDetailDao userDetailDao;
+    private final JWTUtils jwtUtils;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -37,7 +38,7 @@ public class JwtFilterConfig extends OncePerRequestFilter {
             final String token = header.substring(7);
             final String email = jwtUtils.extractUsername(token);
         if (null != email && null ==  SecurityContextHolder.getContext().getAuthentication()) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+            UserDetails userDetails = userDetailDao.loadUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
             if (jwtUtils.isValidToken(token,userDetails)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
