@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,12 +21,17 @@ import wang.yuqi.springsecurityyuqi.util.JWTUtils;
 import java.io.IOException;
 
 @Configuration
-@AllArgsConstructor
 public class JwtFilterConfig extends OncePerRequestFilter {
 
-
+    @Resource
     private final UserDetailDao userDetailDao;
+    @Resource
     private final JWTUtils jwtUtils;
+
+    public JwtFilterConfig(UserDetailDao userDetailDao, JWTUtils jwtUtils) {
+        this.userDetailDao = userDetailDao;
+        this.jwtUtils = jwtUtils;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

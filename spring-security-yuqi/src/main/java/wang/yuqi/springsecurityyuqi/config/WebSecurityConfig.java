@@ -28,11 +28,7 @@ import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import wang.yuqi.springsecurityyuqi.dao.UserDetailDao;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
-import static java.lang.StringTemplate.STR;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @EnableWebSecurity
@@ -79,7 +75,7 @@ public class WebSecurityConfig {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setUserDetailsService(userDetailsService());
         daoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder());
-        return new DaoAuthenticationProvider();
+        return daoAuthenticationProvider;
     }
 
     @Bean

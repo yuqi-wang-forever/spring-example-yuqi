@@ -24,8 +24,7 @@ public class JWTUtils {
 
     public static final String SECRET = "whatever";
     // byte[] bytes = Decoders.BASE64.decode(SECRET);
-    byte[] bytes = SECRET.getBytes();
-    Key key = Keys.hmacShaKeyFor(bytes);
+
 
     public static final String TOKEN_PREFIX = "Bearer ";
 
@@ -44,6 +43,8 @@ public class JWTUtils {
     }
 
     public String  createJSONWebToken(Map<String,Object> claims,UserDetails userDetails){
+        byte[] bytes = SECRET.getBytes();
+        Key key = Keys.hmacShaKeyFor(bytes);
         return Jwts.builder()
                 .subject(userDetails.getUsername())
                 .claims(claims)
@@ -83,7 +84,9 @@ public class JWTUtils {
 
     private Claims extractAllClaims(String token) {
         // byte[] bytes = Decoders.BASE64.decode(SECRET);
-
+        byte[] bytes = SECRET.getBytes();
+        Key key = Keys.hmacShaKeyFor(bytes);
        return Jwts.parser().verifyWith((PublicKey) key).build().parseSignedClaims(token).getPayload();
     }
+
 }

@@ -1,5 +1,6 @@
 package wang.yuqi.springsecurityyuqi.dao;
 
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,7 +14,7 @@ import java.util.List;
 
 @Repository
 public class UserDetailDao{
-    private static final String ROLE_ADMIN = "ROLE_ADMIN";
+    private final String ROLE_ADMIN = "ROLE_ADMIN";
 
     private final List<UserDetails> APPLICATION_USER = List.of(
             new User(
@@ -32,7 +33,8 @@ public class UserDetailDao{
         return APPLICATION_USER.stream()
                 .filter(userDetails -> userDetails.getUsername().equals(username))
                 .findFirst()
-                .orElseThrow(() -> new UsernameNotFoundException(STR."Unfortunately \{username} is not found"))
+                //.orElseThrow(() -> new UsernameNotFoundException(STR."Unfortunately \{username} is not found"))
+                .orElseThrow(() -> new UsernameNotFoundException("Unfortunately" + username + "is not found"))
                 ;
     }
 

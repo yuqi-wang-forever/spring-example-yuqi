@@ -23,16 +23,16 @@ import wang.yuqi.springsecurityyuqi.util.JWTUtils;
 public class AuthenticationController {
     // 在config类注入自己的
     // {@link WebSecurityConfig#authenticationManager(AuthenticationConfiguration authenticationConfiguration)}
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
     private final UserDetailDao userDetailDao;
     private final JWTUtils jwtUtils;
 
-    @GetExchange("authenticate")
+    @GetExchange("/authenticate")
     public ResponseEntity<String> authenticate(@RequestBody AuthenticationRequest authenticationRequest) {
         Authentication authenticate = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword())
+                new UsernamePasswordAuthenticationToken(authenticationRequest.username(), authenticationRequest.password())
         );
-        UserDetails userDetails = userDetailDao.loadUserByUsername(authenticationRequest.getUsername());
+        UserDetails userDetails = userDetailDao.loadUserByUsername(authenticationRequest.username());
         if (null != userDetails) {
             return ResponseEntity.ok(jwtUtils.generateJSONWebToken(userDetails));
         }
